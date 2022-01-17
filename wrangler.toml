@@ -16,3 +16,6 @@ watch_dir = "build/index.js"
 
 [build.upload]
 format="service-worker"
+
+[vars]
+GRAPHCMS_ENDPOINT="https://api-us-east-1.graphcms.com/v2/ckyi2ey742jhn01z3hrx828qk/master"

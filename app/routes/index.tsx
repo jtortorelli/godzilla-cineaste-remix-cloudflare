@@ -1,4 +1,24 @@
+import { gql, GraphQLClient } from "graphql-request";
+import { useLoaderData } from "@remix-run/react";
+
+const GetFilmsQuery = gql`
+  {
+    films {
+      title
+    }
+  }
+`;
+
+export let loader = async () => {
+  const graphcms = new GraphQLClient(GRAPHCMS_ENDPOINT, { fetch: fetch });
+  console.log(GRAPHCMS_ENDPOINT);
+  const { films } = await graphcms.request(GetFilmsQuery);
+  console.log(films);
+  return films;
+};
+
 export default function Index() {
+  let films = useLoaderData();
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
       <h1>Welcome to Remix</h1>
@@ -26,9 +46,10 @@ export default function Index() {
             Remix Docs
           </a>
         </li>
-        <li>
-          this is a shameless plug for my other site!
-        </li>
+        <li>this is a shameless plug for my other site!</li>
+        {films.map((film) => (
+          <li>{film.title}</li>
+        ))}
       </ul>
     </div>
   );

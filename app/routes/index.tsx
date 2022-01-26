@@ -3,16 +3,20 @@ import { useLoaderData } from "@remix-run/react";
 
 const GetFilmsQuery = gql`
   {
-    films {
+    queryFilm {
       title
     }
   }
 `;
 
 export let loader = async () => {
-  const graphcms = new GraphQLClient(GRAPHCMS_ENDPOINT, { fetch: fetch });
-  console.log(GRAPHCMS_ENDPOINT);
-  const { films } = await graphcms.request(GetFilmsQuery);
+  const graphql = new GraphQLClient(GRAPHQL_ENDPOINT, {
+    fetch: fetch,
+    headers: { "Dg-Auth": GRAPHQL_TOKEN },
+  });
+  const result = await graphql.request(GetFilmsQuery);
+  console.log(result);
+  const { queryFilm: films } = result;
   console.log(films);
   return films;
 };

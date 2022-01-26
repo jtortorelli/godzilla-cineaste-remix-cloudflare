@@ -1,22 +1,26 @@
-import { gql, GraphQLClient } from "graphql-request";
 import { useLoaderData } from "@remix-run/react";
 
-const GetFilmsQuery = gql`
-  {
+export let loader = async () => {
+  const result = await fetch(GRAPHQL_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Dg-Auth": GRAPHQL_TOKEN,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: `
+    query MyQuery {
     queryFilm {
       title
     }
   }
-`;
-
-export let loader = async () => {
-  const graphql = new GraphQLClient(GRAPHQL_ENDPOINT, {
-    fetch: fetch,
-    headers: { "Dg-Auth": GRAPHQL_TOKEN },
+  `,
+    }),
   });
-  const result = await graphql.request(GetFilmsQuery);
-  console.log(result);
-  const { queryFilm: films } = result;
+  console.error("result", result);
+  const json = await result.json();
+  console.error("json", json);
+  const { queryFilm: films } = json.data;
   console.log(films);
   return films;
 };
@@ -52,7 +56,7 @@ export default function Index() {
         </li>
         <li>this is a shameless plug for my other site!</li>
         {films.map((film) => (
-          <li>{film.title}</li>
+          <li key={film.title}>{film.title}</li>
         ))}
       </ul>
     </div>

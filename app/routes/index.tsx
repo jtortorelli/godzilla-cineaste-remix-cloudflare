@@ -1,4 +1,5 @@
 import { useLoaderData } from "@remix-run/react";
+import { Film } from "../../remix.env";
 
 export let loader = async () => {
   const result = await fetch(GRAPHQL_ENDPOINT, {
@@ -17,11 +18,8 @@ export let loader = async () => {
   `,
     }),
   });
-  console.error("result", result);
   const json = await result.json();
-  console.error("json", json);
   const { queryFilm: films } = json.data;
-  console.log(films);
   return films;
 };
 
@@ -55,7 +53,7 @@ export default function Index() {
           </a>
         </li>
         <li>this is a shameless plug for my other site!</li>
-        {films.map((film) => (
+        {films.map((film: Film) => (
           <li key={film.title}>{film.title}</li>
         ))}
       </ul>

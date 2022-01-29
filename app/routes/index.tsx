@@ -1,54 +1,10 @@
-import { useLoaderData } from "@remix-run/react";
-import { Film } from "../../remix.env";
-import { query } from "~/graphql.server";
-
-export let loader = async () => {
-  const filmQuery = `query MyQuery {
-    queryFilm {
-      title
-    }
-  }`;
-  const {
-    data: { queryFilm: films },
-  } = await query(filmQuery);
-
-  return films;
-};
+import Nav from "~/components/Nav";
 
 export default function Index() {
-  let films = useLoaderData();
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-        <li>this is a shameless plug for my other site!</li>
-        {films.map((film: Film) => (
-          <li key={film.title}>{film.title}</li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Nav />
+      <h1>Home</h1>
+    </>
   );
 }

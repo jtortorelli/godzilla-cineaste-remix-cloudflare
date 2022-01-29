@@ -1,25 +1,17 @@
 import { useLoaderData } from "@remix-run/react";
 import { Film } from "../../remix.env";
+import { query } from "~/graphql.server";
 
 export let loader = async () => {
-  const result = await fetch(GRAPHQL_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Dg-Auth": GRAPHQL_TOKEN,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query: `
-    query MyQuery {
+  const filmQuery = `query MyQuery {
     queryFilm {
       title
     }
-  }
-  `,
-    }),
-  });
-  const json = await result.json();
-  const { queryFilm: films } = json.data;
+  }`;
+  const {
+    data: { queryFilm: films },
+  } = await query(filmQuery);
+
   return films;
 };
 

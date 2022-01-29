@@ -3,6 +3,8 @@
 /// <reference types="@cloudflare/workers-types" />
 export type Film = {
   title: string;
+  slug: string;
+  releaseDate: Date;
 };
 
 declare global {

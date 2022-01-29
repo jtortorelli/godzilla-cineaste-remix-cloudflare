@@ -19,7 +19,7 @@ export let loader = async () => {
 };
 
 export default function FilmsIndexRoute() {
-  let films: Film[] = useLoaderData();
+  let films = useLoaderData();
   return (
     <>
       <Nav />

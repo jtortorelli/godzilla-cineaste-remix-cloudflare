@@ -7,5 +7,5 @@ node_modules
 /.idea
 
 .env
-/app/tailwind.css
+/app/styles/app.css
 .mf

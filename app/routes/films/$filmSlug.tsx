@@ -44,11 +44,15 @@ export default function FilmRoute() {
   return (
     <>
       <Nav />
-      <h1>{film.title}</h1>
+      <h1 className="font-heading">{film.title}</h1>
       <table>
         <tbody>
           <tr>
-            <td>releaseDate</td>
+            <td>
+              <div>
+                <span className="font-body">releaseDate</span>
+              </div>
+            </td>
             <td>
               {formatInTimeZone(
                 new Date(film.releaseDate),

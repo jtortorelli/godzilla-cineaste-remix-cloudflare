@@ -3,8 +3,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        heading: ["Oswald", "serif", "sans-serif"],
-        body: ["Lato", "sans-serif"],
+        heading: ['"Quando"', "serif", "sans-serif"],
+        body: ['"Abel"', "sans-serif"],
       },
     },
   },

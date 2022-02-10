@@ -1,9 +1,8 @@
-import { LoaderFunction } from "remix";
-import Nav from "~/components/Nav";
-import { query } from "~/graphql.server";
 import { useLoaderData } from "@remix-run/react";
 import { formatInTimeZone } from "date-fns-tz";
-import { FilmAlias, Person, Studio } from "../../../remix.env";
+import { LoaderFunction } from "remix";
+import { query } from "~/graphql.server";
+import { FilmAlias, Person, Staff, Studio } from "../../../remix.env";
 
 export let loader: LoaderFunction = async ({ params }) => {
   const filmQuery = `{
@@ -31,6 +30,15 @@ export let loader: LoaderFunction = async ({ params }) => {
         slug
       }
     }
+    staff {
+      role
+      order
+      member {
+        slug
+        displayName
+      }
+    }
+    posterUrl
   }
   }`;
   const {
@@ -43,37 +51,21 @@ export default function FilmRoute() {
   let film = useLoaderData();
   return (
     <>
-      <Nav />
-      <div className="flex flex-row gap-2">
-        <div className="p-4 flex flex-col bg-red-900 text-amber-50 w-fit rounded-lg shadow-md">
-          <div className="font-body text-sm tracking-widest">
-            Godzilla Series No. 1
-          </div>
-          <div className="font-heading text-xl py-2 tracking-widest">
+      <div className="grid grid-cols-1 gap-2">
+        {/*Red Top Title*/}
+        <div className="flex justify-center rounded-lg p-4 shadow-xl shadow-red-900/40">
+          <div className="font-heading py-2 text-2xl font-extrabold uppercase tracking-widest text-red-900">
             {film.title}
           </div>
-          <div className="flex flex-row gap-2 tracking-widest">
-            <div className="font-body text-sm flex gap-1 items-center">
+        </div>
+
+        {/*Film Info*/}
+        <div className="flex justify-center gap-2 rounded-lg p-1">
+          <div className="font-body flex items-center gap-1 text-base font-medium">
+            <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-              </svg>
-              Toho
-            </div>
-            <div className="font-body text-sm flex gap-1 items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
+                className="h-4 w-4 text-red-900"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -85,12 +77,21 @@ export default function FilmRoute() {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              3 Nov 1954
             </div>
-            <div className="font-body text-sm flex gap-1 items-center">
+            <div>
+              {formatInTimeZone(
+                new Date(film.releaseDate),
+                "UTC",
+                "d MMM yyyy"
+              )}
+            </div>
+          </div>
+
+          <div className="font-body flex items-center gap-1 text-base font-medium">
+            <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
+                className="h-4 w-4 text-red-900"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -102,100 +103,125 @@ export default function FilmRoute() {
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              97m
+            </div>
+            <div>{film.runtime}m</div>
+          </div>
+          <div className="font-body flex items-center gap-1 text-base font-medium">
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-red-900"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
+              </svg>
+            </div>
+            <div>
+              {film.studios.map((studio: Studio) => `${studio.name}`).join(",")}
             </div>
           </div>
         </div>
 
-        <div className="p-4 w-fit rounded-lg flex-col shadow-md">
-          <div className="font-body text-sm tracking-widest">
-            Original Title
-          </div>
-          <div className="text-xl font-serif py-2 tracking-widest">
-            {film.originalTitle.original}
-          </div>
-          <div className="flex flex-row gap-2 items-center">
-            <div className="text-sm font-body italic">
-              {film.originalTitle.transliteration}
+        {/*translation stuff*/}
+        <div className="flex flex-col items-center gap-1 rounded-lg p-1">
+          {/*<div className="uppercase font-heading text-sm text-red-900">*/}
+          {/*  Japanese Title*/}
+          {/*</div>*/}
+          <div className="flex flex-row items-baseline justify-around gap-2">
+            <div className="font-body text-base">
+              {film.originalTitle.original}
             </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
-              />
-            </svg>
-            <div className="text-sm font-body italic">
+            <div className="font-body text-base font-medium text-slate-500">
+              ({film.originalTitle.transliteration})
+            </div>
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-red-900"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                />
+              </svg>
+            </div>
+            <div className="font-body text-base font-medium text-slate-500">
               {film.originalTitle.translation}
             </div>
           </div>
         </div>
-      </div>
-      <h1 className="font-heading">{film.title}</h1>
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <div>
-                <span className="font-body">releaseDate</span>
+
+        {/*Poster*/}
+        <div className="my-1 mx-auto w-fit rounded-lg shadow-xl shadow-red-900/40">
+          <img
+            className="mx-auto rounded-lg object-cover"
+            src={film.posterUrl}
+          />
+        </div>
+
+        {/*<div className="font-body text-sm tracking-wide font-medium">*/}
+        {/*  Godzilla Series No. 1*/}
+        {/*</div>*/}
+
+        {/*Based on*/}
+        <div className="flex flex-col items-center justify-center rounded-lg p-1">
+          <div className="font-heading text-sm uppercase text-red-900">
+            Based on the {film.basedOn.format} by
+          </div>
+          <div className="font-body text-base font-medium">
+            {film.basedOn.authors
+              .map((author: Person) => author.displayName)
+              .join(",")}
+          </div>
+        </div>
+
+        {/*Aliases*/}
+        <div className="flex flex-col items-center rounded-lg p-1">
+          <div className="font-heading text-sm uppercase text-red-900">
+            Also known as
+          </div>
+          <div>
+            {film.aliases.map((alias: FilmAlias) => (
+              <div className="flex flex-col items-center">
+                <div className="font-heading text-base">{alias.alias}</div>
+                <div className="font-body text-sm font-medium text-slate-500">
+                  {alias.context}
+                </div>
               </div>
-            </td>
-            <td>
-              {formatInTimeZone(
-                new Date(film.releaseDate),
-                "UTC",
-                "d MMM yyyy"
-              )}
-            </td>
-          </tr>
-          <tr>
-            <td>runtime</td>
-            <td>{film.runtime}</td>
-          </tr>
-          <tr>
-            <td>original title</td>
-            <td>{film.originalTitle.original}</td>
-          </tr>
-          <tr>
-            <td>transliteration</td>
-            <td>{film.originalTitle.transliteration}</td>
-          </tr>
-          <tr>
-            <td>translation</td>
-            <td>{film.originalTitle.translation}</td>
-          </tr>
-          <tr>
-            <td>aliases</td>
-            <td>
-              {film.aliases
-                .map((alias: FilmAlias) => `${alias.alias} (${alias.context})`)
-                .join(",")}
-            </td>
-          </tr>
-          <tr>
-            <td>studios</td>
-            <td>
-              {film.studios.map((studio: Studio) => `${studio.name}`).join(",")}
-            </td>
-          </tr>
-          <tr>
-            <td>based on</td>
-            <td>
-              the {film.basedOn.format} by{" "}
-              {film.basedOn.authors
-                .map((author: Person) => author.displayName)
-                .join(",")}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="grid auto-cols-max gap-2">
+            <div className="font-heading col-span-2 text-center text-sm uppercase text-red-900">
+              Staff
+            </div>
+            {film.staff.map((staff: Staff) => (
+              <>
+                <div className="font-body p-1 text-right text-base font-medium text-slate-500">
+                  {staff.role}
+                </div>
+                <div className="font-body p-1 text-base font-medium">
+                  {staff.member.displayName}
+                </div>
+              </>
+            ))}
+          </div>
+        </div>
+      </div>
     </>
   );
 }

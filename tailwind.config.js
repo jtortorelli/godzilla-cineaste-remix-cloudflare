@@ -3,8 +3,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        heading: ['"Quando"', "serif", "sans-serif"],
-        body: ['"Abel"', "sans-serif"],
+        heading: ['"Poppins"', "serif", "sans-serif"],
+        prose: ['"Enriqueta"', "serif"],
+        body: ['"Zen Maru Gothic"', "sans-serif"],
       },
     },
   },

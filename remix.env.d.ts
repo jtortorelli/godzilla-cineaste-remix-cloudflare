@@ -53,6 +53,7 @@ export type Film = {
   studios: Studio[];
   basedOn: Work;
   staff: Staff[];
+  posterUrl: string;
 };
 
 declare global {

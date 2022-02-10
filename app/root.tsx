@@ -1,3 +1,4 @@
+import type { MetaFunction } from "remix";
 import {
   Links,
   LiveReload,
@@ -6,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "remix";
-import type { MetaFunction } from "remix";
+import Nav from "./components/Nav";
 import styles from "./styles/app.css";
 
 export const meta: MetaFunction = () => {
@@ -26,8 +27,10 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-amber-50">
-        <div className="container px-4">
+      <body>
+        <div className="container mx-auto px-4">
+          <Nav />
+
           <Outlet />
         </div>
         <ScrollRestoration />

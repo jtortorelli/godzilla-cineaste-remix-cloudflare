@@ -28,9 +28,8 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <Nav />
         <div className="container mx-auto px-4">
-          <Nav />
-
           <Outlet />
         </div>
         <ScrollRestoration />

@@ -12,12 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: install dependencies
-        run: 'npm install'
+        run: "npm install"
       - name: wrangler install
-        run: 'npm install -g @cloudflare/wrangler'
-      - name: remix build
-        run: 'npm run build'
-      - name: wrangler publish
-        run: 'wrangler publish'
+        run: "npm install -g @cloudflare/wrangler"
+      - name: deploy
+        run: "npm run deploy"
         env:
           CF_API_TOKEN: ${{secrets.CF_API_TOKEN}}

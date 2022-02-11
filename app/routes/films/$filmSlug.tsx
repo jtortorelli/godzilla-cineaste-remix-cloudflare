@@ -1,5 +1,6 @@
 import { useLoaderData } from "@remix-run/react";
 import { formatInTimeZone } from "date-fns-tz";
+import { chain, groupBy } from "lodash";
 import { LoaderFunction } from "remix";
 import { query } from "~/graphql.server";
 import { FilmAlias, Person, Staff, Studio } from "../../../remix.env";
@@ -30,7 +31,7 @@ export let loader: LoaderFunction = async ({ params }) => {
         slug
       }
     }
-    staff {
+    staff(order: {asc: order}) {
       role
       order
       member {
@@ -44,7 +45,11 @@ export let loader: LoaderFunction = async ({ params }) => {
   const {
     data: { getFilm: film },
   } = await query(filmQuery);
-  return film;
+  return {
+    ...film,
+    uniqueStaffRoles: chain(film.staff).map("role").uniq().value(),
+    groupedStaff: groupBy(film.staff, "role"),
+  };
 };
 
 export default function FilmRoute() {
@@ -209,13 +214,15 @@ export default function FilmRoute() {
             <div className="font-heading col-span-2 text-center text-sm uppercase text-red-900">
               Staff
             </div>
-            {film.staff.map((staff: Staff) => (
+            {film.uniqueStaffRoles.map((staffRole: string) => (
               <>
                 <div className="font-body p-1 text-right text-base font-medium text-slate-500">
-                  {staff.role}
+                  {staffRole}
                 </div>
                 <div className="font-body p-1 text-base font-medium">
-                  {staff.member.displayName}
+                  {film.groupedStaff[staffRole].map((staff: Staff) => (
+                    <div>{staff.member.displayName}</div>
+                  ))}
                 </div>
               </>
             ))}

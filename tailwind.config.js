@@ -4,8 +4,8 @@ module.exports = {
     extend: {
       fontFamily: {
         heading: ['"Poppins"', "serif", "sans-serif"],
-        prose: ['"Enriqueta"', "serif"],
-        body: ['"Zen Maru Gothic"', "sans-serif"],
+        body: ['"Varela Round"', "sans-serif"],
+        japanese: ['"Zen Maru Gothic"', "sans-serif"],
       },
     },
   },

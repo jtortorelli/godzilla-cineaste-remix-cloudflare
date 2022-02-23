@@ -1,6 +1,6 @@
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { formatInTimeZone } from "date-fns-tz";
-import { chain, groupBy } from "lodash";
+import { chain, find, groupBy } from "lodash";
 import { LoaderFunction } from "remix";
 import { query } from "~/graphql.server";
 import { FilmAlias, Person, Staff, Studio } from "../../../remix.env";
@@ -40,6 +40,21 @@ export let loader: LoaderFunction = async ({ params }) => {
       }
     }
     posterUrl
+    entryOf {
+      entryNumber
+      era
+      eraEntryNumber
+      series {
+        name
+        entries {
+          entryNumber
+          film {
+            title
+            slug
+          }
+        }
+      }
+    }
   }
   }`;
   const {
@@ -49,6 +64,14 @@ export let loader: LoaderFunction = async ({ params }) => {
     ...film,
     uniqueStaffRoles: chain(film.staff).map("role").uniq().value(),
     groupedStaff: groupBy(film.staff, "role"),
+    followedBy: find(film.entryOf.series.entries, [
+      "entryNumber",
+      film.entryOf.entryNumber + 1,
+    ]),
+    precededBy: find(film.entryOf.series.entries, [
+      "entryNumber",
+      film.entryOf.entryNumber - 1,
+    ]),
   };
 };
 
@@ -58,8 +81,8 @@ export default function FilmRoute() {
     <>
       <div className="grid grid-cols-1 gap-2">
         {/*Red Top Title*/}
-        <div className="flex justify-center rounded-lg p-4 shadow-xl shadow-red-900/40">
-          <div className="font-heading py-2 text-2xl font-extrabold uppercase tracking-widest text-red-900">
+        <div className="flex justify-center rounded-lg p-2">
+          <div className="font-heading text-center text-2xl font-bold uppercase tracking-widest text-red-900">
             {film.title}
           </div>
         </div>
@@ -140,7 +163,7 @@ export default function FilmRoute() {
           {/*  Japanese Title*/}
           {/*</div>*/}
           <div className="flex flex-row items-baseline justify-around gap-2">
-            <div className="font-body text-base">
+            <div className="font-japanese text-base font-medium">
               {film.originalTitle.original}
             </div>
             <div className="font-body text-base font-medium text-slate-500">
@@ -209,8 +232,42 @@ export default function FilmRoute() {
           </div>
         </div>
 
+        {/*Series*/}
+        <div className="flex flex-col items-center rounded-lg p-1">
+          <div className="font-heading text-sm uppercase text-red-900">
+            {film.entryOf.series.name} Series No. {film.entryOf.entryNumber}
+          </div>
+          <div className="font-body text-sm font-medium text-slate-500">
+            {film.entryOf.era} No. {film.entryOf.eraEntryNumber}
+          </div>
+
+          <Link to={`/films/${film.followedBy.film.slug}`}>
+            <div className="flex flex-row items-center gap-1">
+              <div className="font-heading text-base">
+                {film.followedBy.film.title}
+              </div>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 text-red-900"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </Link>
+        </div>
+
         <div className="flex justify-center">
-          <div className="grid auto-cols-max gap-2">
+          <div className="grid auto-cols-max">
             <div className="font-heading col-span-2 text-center text-sm uppercase text-red-900">
               Staff
             </div>

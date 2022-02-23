@@ -37,6 +37,7 @@ export type Work = {
 };
 
 export type Staff = {
+  id: string;
   role: string;
   order: number;
   member: Person;

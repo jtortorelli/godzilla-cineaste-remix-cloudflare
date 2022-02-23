@@ -1,0 +1,16 @@
+{
+  "set": [
+    {
+      "uid": "_:blank9",
+      "dgraph.type": "Role",
+      "Role.name": "Masaji",
+      "Role.order": 8,
+      "Role.actor": { "uid": "0x7b61c46bc" },
+      "Role.film": { "uid": "0x7b06e66e4" }
+    },
+    { "uid": "0x7b06e66e4", "Film.cast": { "uid": "_:blank9" } },
+    { "uid": "0x7b61c46bc", "Person.appearedIn": { "uid": "_:blank9" } }
+  ]
+}
+
+"_:blank2 <dgraph.type> "Role" ._:blank2 <Role.name> "Ogata Hideto" ._:blank2 <Role.order> "1"^^<xs:int> ._:blank2 <Role.actor> <0x7b1310a72> .<0x7b1310a72> <Person.appearedIn> _:blank2 .<0x7b06e66e4> <Film.cast> _:blank2 ._:blank2 <Role.film> <0x7b06e66e4> ."

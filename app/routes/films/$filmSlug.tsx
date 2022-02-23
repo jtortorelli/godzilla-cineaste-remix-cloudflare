@@ -1,6 +1,7 @@
 import { Link, useLoaderData } from "@remix-run/react";
 import { formatInTimeZone } from "date-fns-tz";
 import { chain, find, groupBy } from "lodash";
+import React from "react";
 import { LoaderFunction } from "remix";
 import { query } from "~/graphql.server";
 import { FilmAlias, Person, Staff, Studio } from "../../../remix.env";
@@ -32,6 +33,7 @@ export let loader: LoaderFunction = async ({ params }) => {
       }
     }
     staff(order: {asc: order}) {
+      id
       role
       order
       member {
@@ -205,7 +207,7 @@ export default function FilmRoute() {
 
         {/*Based on*/}
         <div className="flex flex-col items-center justify-center rounded-lg p-1">
-          <div className="font-heading text-sm uppercase text-red-900">
+          <div className="font-heading text-sm font-bold uppercase text-red-900">
             Based on the {film.basedOn.format} by
           </div>
           <div className="font-body text-base font-medium">
@@ -217,13 +219,15 @@ export default function FilmRoute() {
 
         {/*Aliases*/}
         <div className="flex flex-col items-center rounded-lg p-1">
-          <div className="font-heading text-sm uppercase text-red-900">
+          <div className="font-heading text-sm font-bold uppercase text-red-900">
             Also known as
           </div>
           <div>
             {film.aliases.map((alias: FilmAlias) => (
-              <div className="flex flex-col items-center">
-                <div className="font-heading text-base">{alias.alias}</div>
+              <div key={alias.alias} className="flex flex-col items-center">
+                <div className="font-heading text-base font-bold">
+                  {alias.alias}
+                </div>
                 <div className="font-body text-sm font-medium text-slate-500">
                   {alias.context}
                 </div>
@@ -234,16 +238,16 @@ export default function FilmRoute() {
 
         {/*Series*/}
         <div className="flex flex-col items-center rounded-lg p-1">
-          <div className="font-heading text-sm uppercase text-red-900">
+          <div className="font-heading text-sm font-bold uppercase text-red-900">
             {film.entryOf.series.name} Series No. {film.entryOf.entryNumber}
           </div>
-          <div className="font-body text-sm font-medium text-slate-500">
+          <div className="font-heading text-sm font-medium text-slate-500">
             {film.entryOf.era} No. {film.entryOf.eraEntryNumber}
           </div>
 
           <Link to={`/films/${film.followedBy.film.slug}`}>
             <div className="flex flex-row items-center gap-1">
-              <div className="font-heading text-base">
+              <div className="font-heading text-base font-bold">
                 {film.followedBy.film.title}
               </div>
               <div>
@@ -268,20 +272,20 @@ export default function FilmRoute() {
 
         <div className="flex justify-center">
           <div className="grid auto-cols-max">
-            <div className="font-heading col-span-2 text-center text-sm uppercase text-red-900">
+            <div className="font-heading col-span-2 text-center text-sm font-bold uppercase text-red-900">
               Staff
             </div>
-            {film.uniqueStaffRoles.map((staffRole: string) => (
-              <>
+            {film.uniqueStaffRoles.map((staffRole: string, index: number) => (
+              <React.Fragment key={index}>
                 <div className="font-body p-1 text-right text-base font-medium text-slate-500">
                   {staffRole}
                 </div>
                 <div className="font-body p-1 text-base font-medium">
                   {film.groupedStaff[staffRole].map((staff: Staff) => (
-                    <div>{staff.member.displayName}</div>
+                    <div key={staff.id}>{staff.member.displayName}</div>
                   ))}
                 </div>
-              </>
+              </React.Fragment>
             ))}
           </div>
         </div>

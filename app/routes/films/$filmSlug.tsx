@@ -4,7 +4,7 @@ import { chain, find, groupBy } from "lodash";
 import React from "react";
 import { LoaderFunction } from "remix";
 import { query } from "~/graphql.server";
-import { FilmAlias, Person, Staff, Studio } from "../../../remix.env";
+import { FilmAlias, Person, Role, Staff, Studio } from "../../../remix.env";
 
 export let loader: LoaderFunction = async ({ params }) => {
   const filmQuery = `{
@@ -54,6 +54,24 @@ export let loader: LoaderFunction = async ({ params }) => {
             title
             slug
           }
+        }
+      }
+    }
+    cast(order: {asc: order}) {
+      name
+      order
+      qualifiers
+      roleAvatarUrl
+      roleGroupName
+      actorAlias
+      actor {
+        displayName
+        slug
+      }
+      character {
+        ... on KaijuCharacter {
+          slug
+          displayName
         }
       }
     }
@@ -241,9 +259,6 @@ export default function FilmRoute() {
           <div className="font-heading text-sm font-bold uppercase text-red-900">
             {film.entryOf.series.name} Series No. {film.entryOf.entryNumber}
           </div>
-          <div className="font-heading text-sm font-medium text-slate-500">
-            {film.entryOf.era} No. {film.entryOf.eraEntryNumber}
-          </div>
 
           <Link to={`/films/${film.followedBy.film.slug}`}>
             <div className="flex flex-row items-center gap-1">
@@ -270,8 +285,9 @@ export default function FilmRoute() {
           </Link>
         </div>
 
+        {/* Staff */}
         <div className="flex justify-center">
-          <div className="grid auto-cols-max">
+          <div className="grid auto-cols-auto">
             <div className="font-heading col-span-2 text-center text-sm font-bold uppercase text-red-900">
               Staff
             </div>
@@ -284,6 +300,31 @@ export default function FilmRoute() {
                   {film.groupedStaff[staffRole].map((staff: Staff) => (
                     <div key={staff.id}>{staff.member.displayName}</div>
                   ))}
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        {/* Cast */}
+        <div className="flex justify-center">
+          <div className="grid grid-cols-3 items-center">
+            <div className="font-heading col-span-3 text-center text-sm font-bold uppercase text-red-900">
+              Cast
+            </div>
+            {film.cast.map((role: Role, index: number) => (
+              <React.Fragment key={index}>
+                <div className="content-center p-1 text-right">
+                  <img
+                    className="inline h-12 rounded-lg"
+                    src={role.roleAvatarUrl}
+                  />
+                </div>
+                <div className="col-span-2 flex flex-col justify-center p-1">
+                  <div className="font-body text-sm text-slate-500">
+                    {role.name}
+                  </div>
+                  <div className="font-body">{role.actor.displayName}</div>
                 </div>
               </React.Fragment>
             ))}

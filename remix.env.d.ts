@@ -44,6 +44,27 @@ export type Staff = {
   film: Film;
 };
 
+export type Role = {
+  name: string;
+  order: number;
+  qualifiers: string[];
+  roleGroupName: string;
+  roleAvatarUrl: string;
+  actor: Person;
+  actorAlias: string;
+  film: Film;
+  character: Character;
+};
+
+export interface Character {
+  portrayedBy: Role[];
+}
+
+export type KaijuCharacter = Character & {
+  slug: string;
+  displayName: string;
+};
+
 export type Film = {
   title: string;
   slug: string;
@@ -55,6 +76,7 @@ export type Film = {
   basedOn: Work;
   staff: Staff[];
   posterUrl: string;
+  cast: Role[];
 };
 
 declare global {

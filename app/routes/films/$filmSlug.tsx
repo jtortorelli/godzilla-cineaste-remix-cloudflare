@@ -102,7 +102,7 @@ export default function FilmRoute() {
       <div className="grid grid-cols-1 gap-2">
         {/*Red Top Title*/}
         <div className="flex justify-center rounded-lg p-2">
-          <div className="font-heading text-center text-2xl font-bold uppercase tracking-widest text-red-900">
+          <div className="font-heading text-center text-2xl font-extrabold uppercase tracking-widest text-red-900">
             {film.title}
           </div>
         </div>
@@ -243,10 +243,10 @@ export default function FilmRoute() {
           <div>
             {film.aliases.map((alias: FilmAlias) => (
               <div key={alias.alias} className="flex flex-col items-center">
-                <div className="font-heading text-base font-bold">
+                <div className="font-heading text-center text-base font-bold">
                   {alias.alias}
                 </div>
-                <div className="font-body text-sm font-medium text-slate-500">
+                <div className="font-body text-center text-sm font-medium text-slate-500">
                   {alias.context}
                 </div>
               </div>

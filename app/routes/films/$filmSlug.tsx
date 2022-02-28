@@ -41,7 +41,11 @@ export let loader: LoaderFunction = async ({ params }) => {
         displayName
       }
     }
-    posterUrl
+    posters {
+      url
+      isPrimary
+      context
+    }
     entryOf {
       entryNumber
       era
@@ -92,6 +96,7 @@ export let loader: LoaderFunction = async ({ params }) => {
       "entryNumber",
       film.entryOf.entryNumber - 1,
     ]),
+    primaryPoster: find(film.posters, ["isPrimary", true]),
   };
 };
 
@@ -215,7 +220,7 @@ export default function FilmRoute() {
         <div className="my-1 mx-auto w-fit rounded-lg shadow-xl shadow-red-900/40">
           <img
             className="mx-auto rounded-lg object-cover"
-            src={film.posterUrl}
+            src={film.primaryPoster.url}
           />
         </div>
 

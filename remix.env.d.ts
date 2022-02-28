@@ -65,6 +65,12 @@ export type KaijuCharacter = Character & {
   displayName: string;
 };
 
+export type Poster = {
+  url: string;
+  context: string;
+  isPrimary: boolean;
+};
+
 export type Film = {
   title: string;
   slug: string;
@@ -76,6 +82,7 @@ export type Film = {
   basedOn: Work;
   staff: Staff[];
   posterUrl: string;
+  posters: Poster[];
   cast: Role[];
 };
 

@@ -68,6 +68,7 @@ export let loader: LoaderFunction = async ({ params }) => {
       roleAvatarUrl
       roleGroupName
       actorAlias
+      uncredited
       actor {
         displayName
         slug
@@ -357,7 +358,7 @@ export default function FilmRoute() {
               <React.Fragment key={index}>
                 <div className="content-center p-1 text-right">
                   <img
-                    className="inline h-12 rounded-lg"
+                    className="inline h-16 rounded-lg"
                     src={role.avatarUrl}
                   />
                 </div>
@@ -365,11 +366,20 @@ export default function FilmRoute() {
                   <div className="font-body text-base text-slate-500">
                     {role.roleName}
                   </div>
-                  <div className="font-heading font-semibold">
-                    {role.actors
-                      .map((actor) => actor.actor.displayName)
-                      .join(", ")}
-                  </div>
+                  {role.actors.map((actor, index: number) => (
+                    <React.Fragment key={index}>
+                      <div className="font-heading font-semibold">
+                        {actor.actor.displayName}
+                      </div>
+                      {actor.uncredited && (
+                        <div>
+                          <span className="font-heading inline-flex items-center justify-center rounded bg-slate-500 px-2 py-1 text-xs font-semibold uppercase leading-none text-white">
+                            Uncredited
+                          </span>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))}
                 </div>
               </React.Fragment>
             ))}
@@ -386,7 +396,7 @@ export default function FilmRoute() {
               <React.Fragment key={index}>
                 <div className="content-center p-1 text-right">
                   <img
-                    className="inline h-12 rounded-lg"
+                    className="inline h-16 rounded-lg"
                     src={role.avatarUrl}
                   />
                 </div>

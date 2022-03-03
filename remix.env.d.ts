@@ -54,6 +54,7 @@ export type Role = {
   actorAlias: string;
   film: Film;
   character?: Character;
+  uncredited: boolean;
 };
 
 export interface Character {

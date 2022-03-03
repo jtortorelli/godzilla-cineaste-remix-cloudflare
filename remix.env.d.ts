@@ -53,7 +53,7 @@ export type Role = {
   actor: Person;
   actorAlias: string;
   film: Film;
-  character: Character;
+  character?: Character;
 };
 
 export interface Character {

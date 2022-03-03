@@ -1,14 +1,14 @@
 import { Link, useLoaderData } from "@remix-run/react";
 import { formatInTimeZone } from "date-fns-tz";
-import { chain, find, groupBy } from "lodash";
+import { chain, find, groupBy, partition } from "lodash";
 import React from "react";
 import { LoaderFunction } from "remix";
 import { query } from "~/graphql.server";
-import { FilmAlias, Person, Role, Staff, Studio } from "../../../remix.env";
+import { Film, FilmAlias, Person, Staff, Studio } from "../../../remix.env";
 
 export let loader: LoaderFunction = async ({ params }) => {
   const filmQuery = `{
-  getFilm(slug: "${params.filmSlug}") {
+  queryFilm(filter: {tenant: {eq: 1}, slug: {eq: "${params.filmSlug}"}}, first: 1) {
     title
     releaseDate
     runtime
@@ -82,10 +82,48 @@ export let loader: LoaderFunction = async ({ params }) => {
   }
   }`;
   const {
-    data: { getFilm: film },
+    data: { queryFilm: films },
   } = await query(filmQuery);
+
+  if (!(films as Film[]).length) {
+    throw new Response("Not Found", { status: 404 });
+  }
+
+  const [film] = films;
+
+  const [kaiju, rest] = partition(film.cast, { roleGroupName: "Kaiju" });
+
+  const chars = chain(rest)
+    .groupBy(
+      (x) => x.character?.slug ?? Math.random().toString().substring(2, 8)
+    )
+    .values()
+    .sortBy((x) => x[0].order)
+    .groupBy((x) => x[0].roleGroupName)
+    .values()
+    .flatten()
+    .map((x) => ({
+      roleName: x[0].name,
+      avatarUrl: x[0].roleAvatarUrl,
+      actors: x,
+    }));
+
+  const formattedKaiju = chain(kaiju)
+    .groupBy(
+      (x) => x.character?.slug ?? Math.random().toString().substring(2, 8)
+    )
+    .values()
+    .sortBy((x) => x[0].order)
+    .map((x) => ({
+      roleName: x[0].name,
+      avatarUrl: x[0].roleAvatarUrl,
+      actors: x,
+    }));
+
   return {
     ...film,
+    kaiju: formattedKaiju,
+    chars,
     uniqueStaffRoles: chain(film.staff).map("role").uniq().value(),
     groupedStaff: groupBy(film.staff, "role"),
     followedBy: find(film.entryOf.series.entries, [
@@ -230,10 +268,10 @@ export default function FilmRoute() {
 
         {/*Based on*/}
         <div className="flex flex-col items-center justify-center rounded-lg p-1">
-          <div className="font-heading text-sm font-bold uppercase text-red-900">
+          <div className="font-heading text-sm font-semibold uppercase text-red-900">
             Based on the {film.basedOn.format} by
           </div>
-          <div className="font-body text-base font-medium">
+          <div className="font-heading text-base font-semibold">
             {film.basedOn.authors
               .map((author: Person) => author.displayName)
               .join(",")}
@@ -242,13 +280,13 @@ export default function FilmRoute() {
 
         {/*Aliases*/}
         <div className="flex flex-col items-center rounded-lg p-1">
-          <div className="font-heading text-sm font-bold uppercase text-red-900">
+          <div className="font-heading text-sm font-semibold uppercase text-red-900">
             Also known as
           </div>
           <div>
             {film.aliases.map((alias: FilmAlias) => (
               <div key={alias.alias} className="flex flex-col items-center">
-                <div className="font-heading text-center text-base font-bold">
+                <div className="font-heading text-center text-base font-semibold">
                   {alias.alias}
                 </div>
                 <div className="font-body text-center text-sm font-medium text-slate-500">
@@ -261,13 +299,13 @@ export default function FilmRoute() {
 
         {/*Series*/}
         <div className="flex flex-col items-center rounded-lg p-1">
-          <div className="font-heading text-sm font-bold uppercase text-red-900">
+          <div className="font-heading text-sm font-semibold uppercase text-red-900">
             {film.entryOf.series.name} Series No. {film.entryOf.entryNumber}
           </div>
 
           <Link to={`/films/${film.followedBy.film.slug}`}>
             <div className="flex flex-row items-center gap-1">
-              <div className="font-heading text-base font-bold">
+              <div className="font-heading text-base font-semibold">
                 {film.followedBy.film.title}
               </div>
               <div>
@@ -293,7 +331,7 @@ export default function FilmRoute() {
         {/* Staff */}
         <div className="flex justify-center">
           <div className="grid auto-cols-auto">
-            <div className="font-heading col-span-2 text-center text-sm font-bold uppercase text-red-900">
+            <div className="font-heading col-span-2 text-center text-sm font-semibold uppercase text-red-900">
               Staff
             </div>
             {film.uniqueStaffRoles.map((staffRole: string, index: number) => (
@@ -301,7 +339,7 @@ export default function FilmRoute() {
                 <div className="font-body p-1 text-right text-base font-medium text-slate-500">
                   {staffRole}
                 </div>
-                <div className="font-body p-1 text-base font-medium">
+                <div className="font-heading p-1 text-base font-semibold">
                   {film.groupedStaff[staffRole].map((staff: Staff) => (
                     <div key={staff.id}>{staff.member.displayName}</div>
                   ))}
@@ -314,22 +352,55 @@ export default function FilmRoute() {
         {/* Cast */}
         <div className="flex justify-center">
           <div className="grid grid-cols-3 items-center">
-            <div className="font-heading col-span-3 text-center text-sm font-bold uppercase text-red-900">
+            <div className="font-heading col-span-3 text-center text-sm font-semibold uppercase text-red-900">
               Cast
             </div>
-            {film.cast.map((role: Role, index: number) => (
+            {film.chars.map((role, index: number) => (
               <React.Fragment key={index}>
                 <div className="content-center p-1 text-right">
                   <img
                     className="inline h-12 rounded-lg"
-                    src={role.roleAvatarUrl}
+                    src={role.avatarUrl}
                   />
                 </div>
                 <div className="col-span-2 flex flex-col justify-center p-1">
-                  <div className="font-body text-sm text-slate-500">
-                    {role.name}
+                  <div className="font-body text-base text-slate-500">
+                    {role.roleName}
                   </div>
-                  <div className="font-body">{role.actor.displayName}</div>
+                  <div className="font-heading font-semibold">
+                    {role.actors
+                      .map((actor) => actor.actor.displayName)
+                      .join(", ")}
+                  </div>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        {/* Kaiju */}
+        <div className="flex justify-center">
+          <div className="grid grid-cols-3 items-center">
+            <div className="font-heading col-span-3 text-center text-sm font-semibold uppercase text-red-900">
+              Kaijū
+            </div>
+            {film.kaiju.map((role, index: number) => (
+              <React.Fragment key={index}>
+                <div className="content-center p-1 text-right">
+                  <img
+                    className="inline h-12 rounded-lg"
+                    src={role.avatarUrl}
+                  />
+                </div>
+                <div className="col-span-2 flex flex-col justify-center p-1">
+                  <div className="font-body text-base text-slate-500">
+                    {role.roleName}
+                  </div>
+                  <div className="font-heading font-semibold">
+                    {role.actors
+                      .map((actor) => actor.actor.displayName)
+                      .join(", ")}
+                  </div>
                 </div>
               </React.Fragment>
             ))}

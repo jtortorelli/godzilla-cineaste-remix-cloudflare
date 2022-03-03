@@ -4,7 +4,7 @@ import { Film } from "../../../remix.env";
 
 export let loader = async () => {
   const allFilmsQuery = `{
-  queryFilm(filter: {tenant: {eq: 1}}, order: {asc: title, then: {asc: releaseDate}}) {
+  queryFilm(filter: {tenant: {eq: 1}, showcased: true}, order: {asc: title, then: {asc: releaseDate}}) {
     title
     releaseDate
     slug

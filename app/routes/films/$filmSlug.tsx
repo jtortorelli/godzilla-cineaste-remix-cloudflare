@@ -8,7 +8,7 @@ import { Film, FilmAlias, Person, Staff, Studio } from "../../../remix.env";
 
 export let loader: LoaderFunction = async ({ params }) => {
   const filmQuery = `{
-  queryFilm(filter: {tenant: {eq: 1}, slug: {eq: "${params.filmSlug}"}}, first: 1) {
+  queryFilm(filter: {tenant: {eq: 1}, showcased: true, slug: {eq: "${params.filmSlug}"}}, first: 1) {
     title
     releaseDate
     runtime
@@ -73,10 +73,8 @@ export let loader: LoaderFunction = async ({ params }) => {
         slug
       }
       character {
-        ... on KaijuCharacter {
           slug
           displayName
-        }
       }
     }
   }

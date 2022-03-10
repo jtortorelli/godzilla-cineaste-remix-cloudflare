@@ -348,13 +348,13 @@ export default function FilmRoute() {
 
         {/* Cast */}
         <div className="flex justify-center">
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid grid-cols-3 items-center gap-y-2">
             <div className="font-heading col-span-3 text-center text-sm font-semibold uppercase text-red-900">
               Cast
             </div>
             {film.chars.map((role, index: number) => (
               <React.Fragment key={index}>
-                <div className="content-center p-1 text-right">
+                <div className="items-center p-1 text-right">
                   <img
                     className="inline h-16 rounded-lg"
                     src={role.avatarUrl}
@@ -381,18 +381,18 @@ export default function FilmRoute() {
                 </div>
               </React.Fragment>
             ))}
-          </div>
-        </div>
+            {/* </div>
+        </div> */}
 
-        {/* Kaiju */}
-        <div className="flex justify-center">
-          <div className="grid grid-cols-3 items-center">
+            {/* Kaiju */}
+            {/* <div className="flex justify-center">
+          <div className="grid grid-cols-3 items-center"> */}
             <div className="font-heading col-span-3 text-center text-sm font-semibold uppercase text-red-900">
               Kaijū
             </div>
             {film.kaiju.map((role, index: number) => (
               <React.Fragment key={index}>
-                <div className="content-center p-1 text-right">
+                <div className="items-center p-1 text-right">
                   <img
                     className="inline h-16 rounded-lg"
                     src={role.avatarUrl}
@@ -402,11 +402,29 @@ export default function FilmRoute() {
                   <div className="font-body text-base text-slate-500">
                     {role.roleName}
                   </div>
-                  <div className="font-heading font-semibold">
-                    {role.actors
-                      .map((actor) => actor.actor.displayName)
-                      .join(", ")}
-                  </div>
+                  {role.actors.map((actor, index: number) => (
+                    <React.Fragment key={index}>
+                      <div className="font-heading font-semibold">
+                        {actor.actor.displayName}
+                      </div>
+                      {actor.qualifiers?.map(
+                        (qualifier: string, qindex: number) => (
+                          <div key={qindex}>
+                            <span className="font-heading inline-flex items-center justify-center rounded bg-red-900 px-2 py-1 text-xs font-semibold uppercase leading-none text-white">
+                              {qualifier}
+                            </span>
+                          </div>
+                        )
+                      )}
+                      {actor.uncredited && (
+                        <div>
+                          <span className="font-heading inline-flex items-center justify-center rounded bg-slate-500 px-2 py-1 text-xs font-semibold uppercase leading-none text-white">
+                            Uncredited
+                          </span>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))}
                 </div>
               </React.Fragment>
             ))}

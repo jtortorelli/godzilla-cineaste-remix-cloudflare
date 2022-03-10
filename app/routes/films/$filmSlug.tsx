@@ -72,6 +72,7 @@ export let loader: LoaderFunction = async ({ params }) => {
       actor {
         displayName
         slug
+        sortName
       }
       character {
           slug
@@ -97,10 +98,7 @@ export let loader: LoaderFunction = async ({ params }) => {
       (x) => x.character?.slug ?? Math.random().toString().substring(2, 8)
     )
     .values()
-    .sortBy((x) => x[0].order)
-    .groupBy((x) => x[0].roleGroupName)
-    .values()
-    .flatten()
+    .sortBy([(x) => x[0].order, (x) => x[0].actor.sortName, (x) => x[0].name])
     .map((x) => ({
       roleName: x[0].name,
       avatarUrl: x[0].roleAvatarUrl,
